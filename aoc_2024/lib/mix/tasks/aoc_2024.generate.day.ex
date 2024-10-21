@@ -52,12 +52,18 @@ defmodule Mix.Tasks.Aoc2024.Generate.Day do
     {arguments, _argv} = positional_args!(argv)
     day = format_day(Map.get(arguments, :day))
 
-    day = String.pad_leading(to_string(day), 2, "0")
-    day_module_name = Igniter.Project.Module.parse("Aoc2024.Day#{day}")
+    full_day = String.pad_leading(to_string(day), 2, "0")
+    day_module_name = Igniter.Project.Module.parse("Aoc2024.Day#{full_day}")
+    test_module_name = Igniter.Project.Module.parse("Aoc2024.Day#{full_day}Test")
 
-    dbg({"day:", day_module_name})
     # Do your work here and return an updated igniter
     igniter
+    |> Igniter.assign(
+      year: 2024,
+      day: day,
+      full_day: full_day,
+      day_module_name: day_module_name
+    )
     |> Igniter.Project.Module.create_module(day_module_name, """
     def part1(args) do
     end
@@ -66,6 +72,53 @@ defmodule Mix.Tasks.Aoc2024.Generate.Day do
 
     end
     """)
+    |> add_mix_task(1)
+    |> add_mix_task(2)
+    |> Igniter.Project.Module.create_module(
+      test_module_name,
+      """
+        use ExUnit.Case
+
+        import #{day_module_name}
+        @tag :skip
+        test "part1" do
+          input = nil
+          result = part1(input)
+
+          assert result
+        end
+
+        @tag :skip
+        test "part2" do
+          input = nil
+          result = part2(input)
+
+          assert result
+          end
+      """,
+      path: Igniter.Project.Module.proper_location(igniter, test_module_name, :test)
+    )
+  end
+
+  defp add_mix_task(igniter, part) do
+    template_path = Path.expand("templates/day_mix_task.heex")
+
+    part_module_name =
+      Igniter.Project.Module.parse("Mix.Tasks.D#{igniter.assigns[:full_day]}.P#{part}")
+
+    assigns =
+      Keyword.merge(
+        Map.to_list(igniter.assigns),
+        part: part,
+        module_name: part_module_name
+      )
+
+    Igniter.copy_template(
+      igniter,
+      template_path,
+      Igniter.Project.Module.proper_location(igniter, part_module_name),
+      assigns
+    )
   end
 
   defp format_day(nil) do
