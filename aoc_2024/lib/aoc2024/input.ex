@@ -17,6 +17,14 @@ defmodule Aoc2024.Input do
     end
   end
 
+  def split_input(input, :new_line) do
+    Regex.split(~r/\n/, input, trim: true)
+  end
+
+  def split_input(input, :spaces) do
+    Regex.split(~r/\s/, input, trim: true)
+  end
+
   defp in_cache?(year, day) do
     File.exists?(tmp_path(year, day))
   end
