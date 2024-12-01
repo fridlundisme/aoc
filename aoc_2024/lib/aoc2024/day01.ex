@@ -2,8 +2,7 @@ defmodule Aoc2024.Day01 do
   require Logger
 
   def part1(input) do
-    rows = Aoc2024.Input.split_input(input, :new_line)
-    {left, right} = get_lists(rows)
+    {left, right} = get_lists(input)
 
     Enum.zip_with(left, right, fn l, r ->
       abs(l - r)
@@ -11,10 +10,18 @@ defmodule Aoc2024.Day01 do
     |> Enum.sum()
   end
 
-  def part2(args) do
+  def part2(input) do
+    {left, right} = get_lists(input)
+    freq = Enum.frequencies(right)
+
+    Enum.reduce(left, 0, fn val, acc ->
+      acc + Map.get(freq, val, 0) * val
+    end)
   end
 
-  defp get_lists(rows) do
+  defp get_lists(input) do
+    rows = Aoc2024.Input.split_input(input, :new_line)
+
     {left, right} =
       rows
       |> Enum.reduce(
