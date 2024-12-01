@@ -29,7 +29,10 @@ defmodule Aoc2024.Input do
         headers: %{cookie: "session=#{cookie}"}
       )
 
-    IO.inspect(["https://adventofcode.com/#{year}/day/#{day}/input", resp], label: "REsponse")
+    case resp.status do
+      200 -> nil
+      _ -> exit("Error downloading file with status: #{resp.status} and body: #{resp.body}")
+    end
 
     resp.body |> then(&File.write!(tmp_path(year, day), &1))
     resp.body
