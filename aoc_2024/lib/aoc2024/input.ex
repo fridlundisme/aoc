@@ -5,9 +5,9 @@ defmodule Aoc2024.Input do
   @doc """
   Get input for `day` of the year
   """
-  def get!(year \\ 2024, day)
+  def get!(day, year \\ 2024)
 
-  def get!(year, day) do
+  def get!(day, year) do
     case in_cache?(year, day) do
       true ->
         File.read!(tmp_path(year, day))
@@ -28,6 +28,8 @@ defmodule Aoc2024.Input do
       Req.get("https://adventofcode.com/#{year}/day/#{day}/input",
         headers: %{cookie: "session=#{cookie}"}
       )
+
+    IO.inspect(["https://adventofcode.com/#{year}/day/#{day}/input", resp], label: "REsponse")
 
     resp.body |> then(&File.write!(tmp_path(year, day), &1))
     resp.body

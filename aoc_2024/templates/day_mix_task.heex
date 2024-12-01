@@ -5,7 +5,8 @@ defmodule <%= @module_name %> do
 
   @shortdoc "Day <%= @day %> Part <%= @part %>"
   def run(args) do
-    input = Aoc2024.Input.get!(<%= @day %>, <%= @year %>)
+    Mix.Task.run("app.start")
+    input = Aoc2024.Input.get!(<%= @day %>)
 
     if Enum.member?(args, "-b"),
       do: Benchee.run(%{part_<%= @part %>: fn -> input |> part<%= @part %>() end}),
