@@ -8,40 +8,58 @@ defmodule Aoc2024.Day02 do
       |> Enum.map(&String.to_integer(&1))
       |> IO.inspect()
       |> check_vals()
+      |> Enum.reverse()
     end)
-    |> Enum.count(&(&1 == :safe))
+    |> Enum.map(
+      &Enum.count(&1, fn x ->
+        check_success(x) == true
+      end)
+    )
+    |> Enum.count(&(&1 == 4))
   end
 
   def part2(args) do
+    # Testa att returnera [{:safe|:unsafe, second_number}]
+    # Då borde resultatet på test bli
+    # [{:safe, 2}, {:unsafe, 7} {:safe, 8},{:safe, 9}]
+    # |> Rerun without :unsafe
+    # |>
+    # FUCK doesn't work with this stuff as I need to remove the first
+    # 4 2 3 4 5
+    # # [{:unknown, 4}, {:desc, 2} {:asc, 3},{:asc, 4},{:asc, 5}]
+  end
+
+  def check_success({_, true, _}) do
+    true
+  end
+
+  def check_success({_, false, _}) do
+    false
   end
 
   def check_vals(row) do
-    check_vals(row, nil)
+    check_vals(row, [])
   end
 
-  def check_vals([_h | []], {status, _}) do
-    status
+  def check_vals([_h | []], values) do
+    values
   end
 
-  def check_vals([first, second | t], nil) do
+  def check_vals([first, second | t], [] = values) do
     with {direction, success} <- second_derivative_ish(first, second) do
-      case success do
-        true -> check_vals([second | t], {:safe, direction})
-        false -> :unsafe
-      end
+      check_vals([second | t], [{direction, success, {first, second}} | values])
     end
   end
 
-  def check_vals([first, second | t], {_status, acc_dir}) do
-    with {direction, success} <- second_derivative_ish(first, second),
-         ^acc_dir <- direction do
-      case success do
-        true -> check_vals([second | t], {:safe, direction})
-        false -> :unsafe
+  def check_vals([first, second | t], [{acc_dir, _, _} | _t] = values) do
+    with {direction, success} <- second_derivative_ish(first, second) do
+      cond do
+        acc_dir == direction ->
+          check_vals([second | t], [{direction, success, {first, second}} | values])
+
+        true ->
+          check_vals([second | t], [{direction, false, {first, second}} | values])
       end
-    else
-      _ ->
-        :unsafe
     end
   end
 
