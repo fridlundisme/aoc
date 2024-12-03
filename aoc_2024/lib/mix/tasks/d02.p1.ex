@@ -8,7 +8,7 @@ defmodule Elixir.Mix.Tasks.D02.P1 do
   def run(args) do
     Mix.Task.run("app.start")
     input = Aoc2024.Input.get!(2)
-    Day02.part1(input) |> IO.inspect(label: "Result")
+    Day02.part1(input) |> IO.inspect(label: "Result Part 1")
 
     if Enum.member?(args, "-b"),
       do: Benchee.run(%{part_1: fn -> input |> part1() end}),

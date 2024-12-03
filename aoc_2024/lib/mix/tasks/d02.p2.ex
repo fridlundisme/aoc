@@ -1,4 +1,5 @@
 defmodule Elixir.Mix.Tasks.D02.P2 do
+  alias Aoc2024.Day02
   use Mix.Task
 
   import Elixir.Aoc2024.Day02
@@ -7,6 +8,7 @@ defmodule Elixir.Mix.Tasks.D02.P2 do
   def run(args) do
     Mix.Task.run("app.start")
     input = Aoc2024.Input.get!(2)
+    Day02.part2(input) |> IO.inspect(label: "Result Part 2")
 
     if Enum.member?(args, "-b"),
       do: Benchee.run(%{part_2: fn -> input |> part2() end}),

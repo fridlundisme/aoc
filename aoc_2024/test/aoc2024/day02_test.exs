@@ -13,16 +13,16 @@ defmodule Aoc2024.Day02Test do
     1 3 6 7 9"
   end
 
+  @tag :skip
   test "part1" do
     result = part1(input())
 
     assert result == 2
   end
 
-  @tag :skip
   test "part2" do
     result = part2(input())
 
-    # assert result == 4
+    assert result == 4
   end
 end
