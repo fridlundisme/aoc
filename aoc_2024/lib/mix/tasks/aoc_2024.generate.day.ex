@@ -82,29 +82,21 @@ defmodule Mix.Tasks.Aoc2024.Generate.Day do
         import #{day_module_name}
 
         def input do
-          ~S"
-        3   4
-        4   3
-        2   5
-        1   3
-        3   9
-        3   3"
+          ~S""
         end
 
         @tag :skip
         test "part1" do
-          input = nil
-          result = part1(input)
+          result = part1(input())
 
-          assert result
+          assert result == nil
         end
 
         @tag :skip
         test "part2" do
-          input = nil
-          result = part2(input)
+          result = part2(input())
 
-          assert result
+          assert result == nil
           end
       """,
       path: Igniter.Project.Module.proper_location(igniter, test_module_name, :test)

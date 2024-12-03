@@ -1,12 +1,15 @@
 defmodule <%= @module_name %> do
   use Mix.Task
 
+  alias Aoc2024.Day0<%= @day %>
   import <%= @day_module_name %>
 
   @shortdoc "Day <%= @day %> Part <%= @part %>"
   def run(args) do
     Mix.Task.run("app.start")
     input = Aoc2024.Input.get!(<%= @day %>)
+    Day0<%=@day%>.part<%= @part %>(input) |> IO.inspect(label: "Result Day <%= @day %> part <%= @part %>")
+
 
     if Enum.member?(args, "-b"),
       do: Benchee.run(%{part_<%= @part %>: fn -> input |> part<%= @part %>() end}),
