@@ -17,6 +17,6 @@ defmodule Aoc2024.Day03Test do
   test "part2" do
     result = part2(input())
 
-    assert result == 48
+    assert result == 69
   end
 end
