@@ -6,16 +6,16 @@ defmodule Aoc2024.Day02 do
     |> Enum.map(fn row ->
       Input.split_input(row, :spaces)
       |> Enum.map(&String.to_integer(&1))
-      |> IO.inspect()
       |> check_vals()
       |> Enum.reverse()
     end)
     |> Enum.map(
-      &Enum.count(&1, fn x ->
-        check_success(x) == true
-      end)
+      &{length(&1),
+       Enum.count(&1, fn x ->
+         check_success(x)
+       end)}
     )
-    |> Enum.count(&(&1 == 4))
+    |> Enum.count(&check_success/1)
   end
 
   def part2(args) do
@@ -29,13 +29,10 @@ defmodule Aoc2024.Day02 do
     # # [{:unknown, 4}, {:desc, 2} {:asc, 3},{:asc, 4},{:asc, 5}]
   end
 
-  def check_success({_, true, _}) do
-    true
-  end
-
-  def check_success({_, false, _}) do
-    false
-  end
+  def check_success({x, x}), do: true
+  def check_success({_, _}), do: false
+  def check_success({_, true, _}), do: true
+  def check_success({_, false, _}), do: false
 
   def check_vals(row) do
     check_vals(row, [])
