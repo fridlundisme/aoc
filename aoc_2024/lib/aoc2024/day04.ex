@@ -6,36 +6,6 @@ defmodule Aoc2024.Day04 do
     %Grid{:grid => grid, height: grid_h, width: grid_w} =
       Grid.from_input(input)
 
-    x_list =
-      Enum.map(0..(grid_w - 1), fn x ->
-        starting_char = Map.get(grid, {x, 0})
-        string_from_diagonal(grid, {x, 0}, :se, starting_char)
-      end)
-      |> List.replace_at(0, "")
-      |> Enum.reduce(0, fn x, acc -> count_instances(x) + acc end)
-
-    y_list =
-      Enum.map(0..(grid_w - 1), fn x ->
-        starting_char = Map.get(grid, {x, 0})
-        string_from_diagonal(grid, {x, 0}, :sw, starting_char)
-      end)
-      |> Enum.reduce(0, fn x, acc -> count_instances(x) + acc end)
-
-    x2_list =
-      Enum.map(0..(grid_w - 1), fn x ->
-        starting_char = Map.get(grid, {x, grid_h - 1})
-        string_from_diagonal(grid, {x, grid_h - 1}, :ne, starting_char)
-      end)
-      |> List.replace_at(0, "")
-      |> Enum.reduce(0, fn x, acc -> count_instances(x) + acc end)
-
-    y2_list =
-      Enum.map(0..(grid_w - 1), fn x ->
-        starting_char = Map.get(grid, {x, grid_h - 1})
-        string_from_diagonal(grid, {x, grid_h - 1}, :nw, starting_char)
-      end)
-      |> Enum.reduce(0, fn x, acc -> count_instances(x) + acc end)
-
     vertical =
       Enum.reduce(0..grid_w, [], fn x, acc ->
         [
@@ -47,10 +17,41 @@ defmodule Aoc2024.Day04 do
       end)
       |> Enum.reduce(0, fn x, acc -> count_instances(x) + acc end)
 
-    vertical + count_horizontal + y_list + y2_list + x_list + x2_list
+    configs = [
+      [sw: [0, :all]],
+      [se: [0, :replace]],
+      [ne: [grid_h - 1, :replace]],
+      [nw: [grid_h - 1, :all]]
+    ]
+
+    diagonals = count_diagonals(grid, configs, grid_w)
+
+    vertical + count_horizontal + diagonals
   end
 
   def part2(args) do
+  end
+
+  def count_diagonals(grid, configs, size) do
+    Enum.reduce(configs, 0, fn [k], acc ->
+      {dir, [pos, stragegy]} = k
+
+      values =
+        Enum.map(0..(size - 1), fn x ->
+          starting_char = Map.get(grid, {x, pos})
+          string_from_diagonal(grid, {x, pos}, dir, starting_char)
+        end)
+
+      sum =
+        if stragegy == :replace do
+          List.replace_at(values, 0, "")
+        else
+          values
+        end
+        |> Enum.reduce(0, fn x, acc -> count_instances(x) + acc end)
+
+      sum + acc
+    end)
   end
 
   def string_from_diagonal(grid, coordinates, direction, char, list \\ [])
