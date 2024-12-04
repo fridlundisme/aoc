@@ -20,10 +20,14 @@ defmodule Grid do
   @cardinal_adjacent_deltas for x <- -1..1, y <- -1..1, abs(x) + abs(y) == 1, do: {x, y}
 
   @directions_by_type %{
-    n: {-1, 0},
-    w: {0, -1},
-    e: {0, 1},
-    s: {1, 0}
+    nw: {-1, -1},
+    ne: {1, -1},
+    n: {0, -1},
+    w: {-1, 0},
+    e: {1, 0},
+    s: {0, 1},
+    se: {1, 1},
+    sw: {-1, 1}
   }
 
   def from_input(input, mapper \\ &Function.identity/1, char_type \\ &String.codepoints/1) do
@@ -36,8 +40,8 @@ defmodule Grid do
     width = length(hd(charlists))
 
     grid =
-      for {line, x} <- Enum.with_index(charlists),
-          {char, y} <- Enum.with_index(line),
+      for {line, y} <- Enum.with_index(charlists),
+          {char, x} <- Enum.with_index(line),
           into: %{} do
         {{x, y}, mapper.(char)}
       end
