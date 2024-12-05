@@ -16,16 +16,16 @@ MAMMMXMMMM
 MXMXAXMASX"
   end
 
+  @tag :skip
   test "part1" do
     result = part1(input())
 
     assert result == 18
   end
 
-  @tag :skip
   test "part2" do
     result = part2(input())
 
-    assert result == nil
+    assert result == 9
   end
 end

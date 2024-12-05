@@ -1,7 +1,9 @@
 defmodule Aoc2024.Day04 do
   def part1(input) do
+    regex = ~r/(?=(XMAS)|(SAMX))/
+
     count_horizontal =
-      count_instances(input)
+      count_instances(input, regex)
 
     %Grid{:grid => grid, height: grid_h, width: grid_w} =
       Grid.from_input(input)
@@ -15,7 +17,7 @@ defmodule Aoc2024.Day04 do
           | acc
         ]
       end)
-      |> Enum.reduce(0, fn x, acc -> count_instances(x) + acc end)
+      |> Enum.reduce(0, fn x, acc -> count_instances(x, regex) + acc end)
 
     configs = [
       [sw: [0, :all]],
@@ -24,15 +26,39 @@ defmodule Aoc2024.Day04 do
       [nw: [grid_h - 1, :all]]
     ]
 
-    diagonals = count_diagonals(grid, configs, grid_w)
+    diagonals = count_diagonals(grid, configs, grid_w, regex, :reduce)
 
     vertical + count_horizontal + diagonals
   end
 
-  def part2(args) do
+  def part2(input) do
+    regex = ~r/(?=(MS)|(SM))/
+
+    %Grid{:grid => grid} = Grid.from_input(input)
+
+    count_diagonals(grid, nil, nil, regex, :crossed)
   end
 
-  def count_diagonals(grid, configs, size) do
+  def count_diagonals(grid, configs, size, regex, stragegy)
+
+  def count_diagonals(grid, _, _, regex, :crossed) do
+    new_grid = Grid.find(grid, "A")
+
+    Enum.map(new_grid, fn {pos, _val} ->
+      {cells_main, cells_anti} = get_diagonals(grid, pos)
+
+      with main_match <- Regex.match?(regex, cells_main),
+           anti_match <- Regex.match?(regex, cells_anti) do
+        cond do
+          main_match && anti_match -> :xmas
+          true -> :miss
+        end
+      end
+    end)
+    |> Enum.count(&(&1 == :xmas))
+  end
+
+  def count_diagonals(grid, configs, size, regex, :reduce) do
     Enum.reduce(configs, 0, fn [k], acc ->
       {dir, [pos, stragegy]} = k
 
@@ -48,7 +74,7 @@ defmodule Aoc2024.Day04 do
         else
           values
         end
-        |> Enum.reduce(0, fn x, acc -> count_instances(x) + acc end)
+        |> Enum.reduce(0, fn x, acc -> count_instances(x, regex) + acc end)
 
       sum + acc
     end)
@@ -72,13 +98,25 @@ defmodule Aoc2024.Day04 do
     string_from_diagonal(grid, new_coords, direction, new_char, [char | list])
   end
 
-  def count_instances(input) do
-    regex = ~r/(?=(XMAS)|(SAMX))/
-
+  def count_instances(input, regex) do
     vals =
       Regex.scan(regex, input)
       |> Enum.flat_map(&Enum.reject(&1, fn x -> x == "" || x == nil end))
 
     Enum.count(vals)
+  end
+
+  def get_diagonals(grid, pos) do
+    main =
+      Grid.adjacent_cells(grid, pos, :diagonal_main)
+      |> Enum.map(fn {_, x} -> x end)
+      |> List.to_string()
+
+    anti =
+      Grid.adjacent_cells(grid, pos, :diagonal_anti)
+      |> Enum.map(fn {_, x} -> x end)
+      |> List.to_string()
+
+    {main, anti}
   end
 end
