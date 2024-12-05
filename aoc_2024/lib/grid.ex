@@ -18,6 +18,9 @@ defmodule Grid do
 
   # List of coords that produce the 4 coordinates horizontally/vertically adjacent to a given coord when added to it
   @cardinal_adjacent_deltas for x <- -1..1, y <- -1..1, abs(x) + abs(y) == 1, do: {x, y}
+  @diagonal_adjacent_deltas_anti [{-1, 1}, {1, -1}]
+  @diagonal_adjacent_deltas_main [{1, 1}, {-1, -1}]
+  @diagonal_adjacent_deltas @diagonal_adjacent_deltas_main ++ @diagonal_adjacent_deltas_anti
 
   @directions_by_type %{
     nw: {-1, -1},
@@ -53,11 +56,49 @@ defmodule Grid do
     }
   end
 
-  def adjacent_cells(grid, cell) do
+  def adjacent_cells(grid, cell, directions \\ :all)
+
+  def adjacent_cells(grid, cell, :all) do
+    Enum.concat(
+      adjacent_cells(grid, cell, :cardinal),
+      adjacent_cells(grid, cell, :diagonal)
+    )
+  end
+
+  def adjacent_cells(grid, cell, :cardinal) do
     @cardinal_adjacent_deltas
     |> Enum.map(&new_coordinates(&1, cell))
     |> Enum.map(fn coor -> {coor, Map.get(grid, coor)} end)
     |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
+  end
+
+  def adjacent_cells(grid, cell, :diagonal_main) do
+    @diagonal_adjacent_deltas_main
+    |> Enum.map(&new_coordinates(&1, cell))
+    |> Enum.map(fn coor -> {coor, Map.get(grid, coor)} end)
+    |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
+  end
+
+  def adjacent_cells(grid, cell, :diagonal_anti) do
+    @diagonal_adjacent_deltas_anti
+    |> Enum.map(&new_coordinates(&1, cell))
+    |> Enum.map(fn coor -> {coor, Map.get(grid, coor)} end)
+    |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
+  end
+
+  def adjacent_cells(grid, cell, :diagonal) do
+    @diagonal_adjacent_deltas
+    |> Enum.map(&new_coordinates(&1, cell))
+    |> Enum.map(fn coor -> {coor, Map.get(grid, coor)} end)
+    |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
+  end
+
+  def find(grid, to_find) when is_list(to_find) do
+    to_find
+  end
+
+  def find(grid, to_find) when is_binary(to_find) do
+    Map.filter(grid, fn {_key, val} -> val == to_find end)
   end
 
   def move(grid, from, direction) do
