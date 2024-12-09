@@ -8,9 +8,17 @@ defmodule Aoc2024.Day06 do
       |> then(&(Grid.find(grid, &1) |> Map.keys() |> Enum.at(0)))
 
     start_moving(grid, starting_coordinates)
-    |> Grid.find("X")
     |> Map.values()
-    |> Enum.count(&(&1 == "X"))
+    |> IO.inspect()
+    |> Enum.count(fn val ->
+      case val do
+        {"X", _} -> true
+        _ -> false
+      end
+    end)
+  end
+
+  def part2(input) do
   end
 
   # Start moving North
@@ -24,7 +32,7 @@ defmodule Aoc2024.Day06 do
   end
 
   def move(grid, :done, position, _) do
-    Map.update!(grid, position, fn _ -> "X" end)
+    mark_visited(grid, position, Map.get(grid, position))
   end
 
   def move(grid, {:rotate, new_dir}, position, _) do
@@ -33,7 +41,7 @@ defmodule Aoc2024.Day06 do
   end
 
   def move(grid, {:cont, new_dir}, position, new_position) do
-    grid = Map.update!(grid, position, fn _ -> "X" end)
+    grid = mark_visited(grid, position, Map.get(grid, position))
     {new_coord, char} = Grid.move(grid, new_position, new_dir)
     move(grid, lookahead(new_dir, char), new_position, new_coord)
   end
@@ -46,6 +54,11 @@ defmodule Aoc2024.Day06 do
     end
   end
 
-  def part2(args) do
+  def mark_visited(grid, position, {"X", _}) do
+    Map.update!(grid, position, fn {val, count} -> {val, count + 1} end)
+  end
+
+  def mark_visited(grid, position, char) do
+    Map.update!(grid, position, fn _ -> {"X", 1} end)
   end
 end
