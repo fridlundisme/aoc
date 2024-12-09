@@ -93,9 +93,10 @@ defmodule Grid do
     |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
   end
 
-  def find(grid, to_find) when is_list(to_find) do
-    to_find
-  end
+  # To implement
+  # def find(grid, to_find) when is_list(to_find) do
+  #   to_find
+  # end
 
   def find(grid, to_find) when is_binary(to_find) do
     Map.filter(grid, fn {_key, val} -> val == to_find end)
@@ -104,6 +105,16 @@ defmodule Grid do
   def move(grid, from, direction) do
     new_coordinates(from, @directions_by_type[direction])
     |> then(fn coord -> {coord, Map.get(grid, coord)} end)
+  end
+
+  def rotate(direction) do
+    case direction do
+      :n -> :e
+      :w -> :n
+      :e -> :s
+      :s -> :w
+      _ -> :error
+    end
   end
 
   defp new_coordinates({x1, x2}, {y1, y2}) do
