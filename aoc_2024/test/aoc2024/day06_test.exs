@@ -27,6 +27,6 @@ defmodule Aoc2024.Day06Test do
   test "part2" do
     result = part2(input())
 
-    # assert result == 6
+    assert result == 6
   end
 end
