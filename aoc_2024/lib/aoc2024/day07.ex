@@ -48,7 +48,7 @@ defmodule Aoc2024.Day07 do
   def calc_next(nil, vals, _), do: vals
 
   def calc_next(val, [h | []], operations) do
-    calc_next(nil, [calculate(val, h, operations)], operations)
+    calc_next(nil, calculate(val, h, operations), operations)
   end
 
   def calc_next(val, [h | t], operations) do
