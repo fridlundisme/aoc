@@ -93,13 +93,24 @@ defmodule Grid do
     |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
   end
 
-  # To implement
-  # def find(grid, to_find) when is_list(to_find) do
-  #   to_find
-  # end
-
   def find(grid, to_find) when is_binary(to_find) do
     Map.filter(grid, fn {_key, val} -> val == to_find end)
+  end
+
+  def find(grid, regex) do
+    Map.filter(grid, fn {_key, val} -> Regex.match?(regex, val) end)
+  end
+
+  def diff_vector({x1, y1}, {x2, y2}, vector_scaling \\ 1) do
+    {(x2 - x1) * vector_scaling, (y2 - y1) * vector_scaling}
+  end
+
+  def fits_in_grid?({w, h}, {x, y}) do
+    cond do
+      x >= w || x < 0 -> false
+      y >= h || y < 0 -> false
+      true -> true
+    end
   end
 
   def move(grid, from, direction) do
@@ -117,7 +128,7 @@ defmodule Grid do
     end
   end
 
-  defp new_coordinates({x1, x2}, {y1, y2}) do
+  def new_coordinates({x1, x2}, {y1, y2}) do
     {x1 + y1, x2 + y2}
   end
 end
