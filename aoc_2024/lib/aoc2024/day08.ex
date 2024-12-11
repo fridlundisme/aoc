@@ -25,7 +25,38 @@ defmodule Aoc2024.Day08 do
     |> Enum.count()
   end
 
-  def part2(_input) do
+  def part2(input) do
+    %Grid{grid: grid, width: width, height: height} = Grid.from_input(input)
+    antennas = Grid.find(grid, ~r/[0-9A-Za-z]/)
+
+    Enum.map(antennas, fn {p, freq} -> {freq, p} end)
+    |> Enum.group_by(
+      fn {freq, _} -> freq end,
+      fn {_freq, p} -> p end
+    )
+    |> Enum.flat_map(fn {_freq, positions} ->
+      Enum.map(positions, fn p ->
+        {p, get_antinodes(p, Enum.filter(positions, &(&1 != p)))}
+      end)
+      |> Enum.flat_map(fn {antenna, antinodes} ->
+        Enum.flat_map(antinodes, fn {x, y} = antinode ->
+          [scale(antenna, antinode, {width, height}) | scale(antenna, {-x, -y}, {width, height})]
+        end)
+      end)
+    end)
+    |> List.flatten()
+    |> Enum.uniq()
+    |> Enum.count()
+  end
+
+  def scale(antenna, scaler, grid_size, acc \\ []) do
+    with new_node <- Grid.new_coordinates(antenna, scaler) do
+      if Grid.fits_in_grid?(grid_size, new_node) do
+        scale(new_node, scaler, grid_size, [new_node | acc])
+      else
+        acc
+      end
+    end
   end
 
   def get_antinodes(p, list, acc \\ [])
