@@ -10,7 +10,15 @@ defmodule Aoc2024.Day07 do
     end)
   end
 
-  def part2(_input) do
+  def part2(input) do
+    parse(input)
+    |> evaluate_equations([:mult, :add, :concat])
+    |> Enum.reduce(0, fn {total, result}, acc ->
+      case Enum.find(result, &(&1 == total)) do
+        nil -> acc
+        _ -> total + acc
+      end
+    end)
   end
 
   def parse(input) do
@@ -53,15 +61,11 @@ defmodule Aoc2024.Day07 do
     end)
   end
 
-  def calculate(val1, val2, :mult) do
-    val1 * val2
-  end
-
-  def calculate(val1, val2, :add) do
-    val1 + val2
-  end
-
-  def calculate(val1, val2, :concat) do
-    String.to_integer(Integer.to_string(val2) <> Integer.to_string(val1))
+  def calculate(val1, val2, operation) do
+    case operation do
+      :mult -> val1 * val2
+      :add -> val1 + val2
+      :concat -> String.to_integer(Integer.to_string(val2) <> Integer.to_string(val1))
+    end
   end
 end
