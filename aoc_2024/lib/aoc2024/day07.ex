@@ -2,23 +2,13 @@ defmodule Aoc2024.Day07 do
   def part1(input) do
     parse(input)
     |> evaluate_equations([:mult, :add])
-    |> Enum.reduce(0, fn {total, result}, acc ->
-      case Enum.find(result, &(&1 == total)) do
-        nil -> acc
-        _ -> total + acc
-      end
-    end)
+    |> calibration_result
   end
 
   def part2(input) do
     parse(input)
     |> evaluate_equations([:mult, :add, :concat])
-    |> Enum.reduce(0, fn {total, result}, acc ->
-      case Enum.find(result, &(&1 == total)) do
-        nil -> acc
-        _ -> total + acc
-      end
-    end)
+    |> calibration_result
   end
 
   def parse(input) do
@@ -40,6 +30,16 @@ defmodule Aoc2024.Day07 do
        Enum.reduce(list, [], fn val, acc ->
          [calc_next(val, acc, operations)] |> List.flatten()
        end)}
+    end)
+  end
+
+  def calibration_result(equations) do
+    equations
+    |> Enum.reduce(0, fn {total, result}, acc ->
+      case Enum.find(result, &(&1 == total)) do
+        nil -> acc
+        _ -> total + acc
+      end
     end)
   end
 
