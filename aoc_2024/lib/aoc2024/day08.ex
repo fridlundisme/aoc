@@ -1,7 +1,7 @@
 defmodule Aoc2024.Day08 do
   def part1(input) do
     %Grid{grid: grid, width: width, height: height} = Grid.from_input(input)
-    antennas = Grid.find(grid, ~r/[0-9A-Za-z]/)
+    antennas = Grid.find(grid, ~r/[0-9A-Za-z]/, :regex)
 
     Enum.map(antennas, fn {p, freq} -> {freq, p} end)
     |> Enum.group_by(
@@ -27,7 +27,7 @@ defmodule Aoc2024.Day08 do
 
   def part2(input) do
     %Grid{grid: grid, width: width, height: height} = Grid.from_input(input)
-    antennas = Grid.find(grid, ~r/[0-9A-Za-z]/)
+    antennas = Grid.find(grid, ~r/[0-9A-Za-z]/, :regex)
 
     Enum.map(antennas, fn {p, freq} -> {freq, p} end)
     |> Enum.group_by(

@@ -33,10 +33,14 @@ defmodule Grid do
     sw: {-1, 1}
   }
 
-  def from_input(input, mapper \\ &Function.identity/1, char_type \\ &String.codepoints/1) do
+  def from_input(input, opts \\ []) do
+    char_type = if _char_type = opts[:char_type], do: opts[:char_type], else: &String.codepoints/1
+    mapper = if _mapper = opts[:mapper], do: opts[:mapper], else: &Function.identity/1
+
     charlists =
       input
       |> String.split()
+      |> IO.inspect()
       |> Enum.map(char_type)
 
     height = length(charlists)
@@ -93,11 +97,11 @@ defmodule Grid do
     |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
   end
 
-  def find(grid, to_find) when is_binary(to_find) do
+  def find(grid, to_find) do
     Map.filter(grid, fn {_key, val} -> val == to_find end)
   end
 
-  def find(grid, regex) do
+  def find(grid, regex, :regex) do
     Map.filter(grid, fn {_key, val} -> Regex.match?(regex, val) end)
   end
 

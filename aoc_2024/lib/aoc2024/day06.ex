@@ -5,7 +5,7 @@ defmodule Aoc2024.Day06 do
     starting_coordinates =
       Regex.run(~r/\^/, input)
       |> List.to_string()
-      |> then(&(Grid.find(grid, &1) |> Map.keys() |> Enum.at(0)))
+      |> then(&(Grid.find(grid, &1, :regex) |> Map.keys() |> Enum.at(0)))
 
     start_moving(grid, starting_coordinates)
     |> Map.values()
@@ -24,7 +24,7 @@ defmodule Aoc2024.Day06 do
     starting_coordinates =
       Regex.run(~r/\^/, input)
       |> List.to_string()
-      |> then(&(Grid.find(grid, &1) |> Map.keys() |> Enum.at(0)))
+      |> then(&(Grid.find(grid, &1, :regex) |> Map.keys() |> Enum.at(0)))
 
     start_moving(grid, starting_coordinates)
     |> Map.filter(fn {key, x} ->
