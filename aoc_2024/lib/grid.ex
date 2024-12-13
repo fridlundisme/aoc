@@ -40,7 +40,6 @@ defmodule Grid do
     charlists =
       input
       |> String.split()
-      |> IO.inspect()
       |> Enum.map(char_type)
 
     height = length(charlists)
