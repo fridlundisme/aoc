@@ -1,6 +1,4 @@
 defmodule Aoc2024.Day02 do
-  alias Aoc2024.Input
-
   def part1(input) do
     map_values(input)
     |> Enum.map(

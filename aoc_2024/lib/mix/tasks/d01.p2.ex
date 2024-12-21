@@ -1,5 +1,4 @@
 defmodule Elixir.Mix.Tasks.D01.P2 do
-  alias Aoc2024.Day01
   use Mix.Task
 
   import Elixir.Aoc2024.Day01
