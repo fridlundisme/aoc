@@ -59,41 +59,75 @@ defmodule Grid do
     }
   end
 
-  def adjacent_cells(grid, cell, directions \\ :all)
+  def mark_cells(grid, cells, mark) when is_list(cells) do
+    Enum.reduce(cells, grid, fn {pos, _}, acc_grid ->
+      Map.update(acc_grid, pos, :out, fn val -> {val, mark} end)
+    end)
+  end
 
-  def adjacent_cells(grid, cell, :all) do
+  def mark_cells(grid, {pos, _}, mark) do
+    Map.update!(grid, pos, fn val -> {val, mark} end)
+  end
+
+  def adjacent_cells(grid, cell, directions \\ :all, filter_nil \\ true)
+
+  def adjacent_cells(grid, cell, :all, filter_nil) do
     Enum.concat(
-      adjacent_cells(grid, cell, :cardinal),
-      adjacent_cells(grid, cell, :diagonal)
+      adjacent_cells(grid, cell, :cardinal, filter_nil),
+      adjacent_cells(grid, cell, :diagonal, filter_nil)
     )
   end
 
-  def adjacent_cells(grid, cell, :cardinal) do
+  def adjacent_cells(grid, cell, :cardinal, filter_nil) do
     @cardinal_adjacent_deltas
     |> Enum.map(&new_coordinates(&1, cell))
     |> Enum.map(fn coor -> {coor, Map.get(grid, coor)} end)
-    |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
+    |> Enum.reject(fn {_coords, val} ->
+      if filter_nil do
+        is_nil(val)
+      else
+        false
+      end
+    end)
   end
 
-  def adjacent_cells(grid, cell, :diagonal_main) do
+  def adjacent_cells(grid, cell, :diagonal_main, filter_nil) do
     @diagonal_adjacent_deltas_main
     |> Enum.map(&new_coordinates(&1, cell))
     |> Enum.map(fn coor -> {coor, Map.get(grid, coor)} end)
-    |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
+    |> Enum.reject(fn {_coords, val} ->
+      if filter_nil do
+        is_nil(val)
+      else
+        false
+      end
+    end)
   end
 
-  def adjacent_cells(grid, cell, :diagonal_anti) do
+  def adjacent_cells(grid, cell, :diagonal_anti, filter_nil) do
     @diagonal_adjacent_deltas_anti
     |> Enum.map(&new_coordinates(&1, cell))
     |> Enum.map(fn coor -> {coor, Map.get(grid, coor)} end)
-    |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
+    |> Enum.reject(fn {_coords, val} ->
+      if filter_nil do
+        is_nil(val)
+      else
+        false
+      end
+    end)
   end
 
-  def adjacent_cells(grid, cell, :diagonal) do
+  def adjacent_cells(grid, cell, :diagonal, filter_nil) do
     @diagonal_adjacent_deltas
     |> Enum.map(&new_coordinates(&1, cell))
     |> Enum.map(fn coor -> {coor, Map.get(grid, coor)} end)
-    |> Enum.reject(fn {_coords, val} -> is_nil(val) end)
+    |> Enum.reject(fn {_coords, val} ->
+      if filter_nil do
+        is_nil(val)
+      else
+        false
+      end
+    end)
   end
 
   def find(grid, to_find) do
