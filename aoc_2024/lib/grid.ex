@@ -33,6 +33,14 @@ defmodule Grid do
     sw: {-1, 1}
   }
 
+  def create_grid(line_width, line_height, starting_x \\ 0, starting_y \\ 0, char \\ nil) do
+    for y <- starting_y..line_height,
+        x <- starting_x..line_width,
+        into: %{} do
+      {{x, y}, char}
+    end
+  end
+
   def from_input(input, opts \\ []) do
     char_type = if _char_type = opts[:char_type], do: opts[:char_type], else: &String.codepoints/1
     mapper = if _mapper = opts[:mapper], do: opts[:mapper], else: &Function.identity/1
@@ -150,9 +158,15 @@ defmodule Grid do
     end
   end
 
-  def move(grid, from, direction) do
+  def move(grid, from, direction) when is_atom(direction) do
     new_coordinates(from, @directions_by_type[direction])
-    |> then(fn coord -> {coord, Map.get(grid, coord)} end)
+    |> then(fn coord ->
+      if Map.has_key?(grid, coord) do
+        {coord, Map.get(grid, coord)}
+      else
+        {:error, coord}
+      end
+    end)
   end
 
   def rotate(direction) do
@@ -167,5 +181,42 @@ defmodule Grid do
 
   def new_coordinates({x1, x2}, {y1, y2}) do
     {x1 + y1, x2 + y2}
+  end
+
+  def print(%Grid{grid: grid, width: w, height: h}, to_find, to_file \\ [write: false]) do
+    # Build a string for each row
+    result =
+      0..h
+      |> Enum.map(fn row ->
+        0..w
+        |> Enum.map(fn col ->
+          val = Map.get(grid, {row, col}, ".")
+
+          if to_find do
+            String.replace(to_string(val), to_find, "#")
+          else
+            Map.get(grid, {row, col}, ".")
+          end
+        end)
+        |> Enum.join("")
+      end)
+      # Join all rows with a newline
+      |> Enum.join("\n")
+
+    # IO.puts(result)
+
+    if Keyword.get(to_file, :write, false) do
+      file_path = Keyword.get(to_file, :path)
+
+      case File.write(file_path, result) do
+        :ok ->
+          IO.puts("File written successfully to #{file_path}")
+          result
+
+        {:error, reason} ->
+          IO.puts("Failed to write file: #{reason} #{file_path}")
+          {:error, reason}
+      end
+    end
   end
 end
