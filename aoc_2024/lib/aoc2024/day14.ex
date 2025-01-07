@@ -145,7 +145,7 @@ defmodule Aoc2024.Day14 do
   end
 
   def move(grid, pos, acc) do
-    case Grid.move(grid, pos, :sw) do
+    case Grid.next(grid, pos, :sw) do
       {:error, val} ->
         [pos | acc]
 

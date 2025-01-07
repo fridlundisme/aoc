@@ -48,7 +48,7 @@ defmodule Aoc2024.Day06 do
     grid = Map.update!(grid, starting_coordinates, fn _ -> {"X", 1} end)
 
     {new_coord, char} =
-      Grid.move(grid, starting_coordinates, starting_direction)
+      Grid.next(grid, starting_coordinates, starting_direction)
 
     move(grid, lookahead(starting_direction, char), starting_coordinates, new_coord)
   end
@@ -63,7 +63,7 @@ defmodule Aoc2024.Day06 do
   end
 
   def move(grid, {:rotate, new_dir}, position, _) do
-    {new_coord, char} = Grid.move(grid, position, new_dir)
+    {new_coord, char} = Grid.next(grid, position, new_dir)
     move(grid, lookahead(new_dir, char), position, new_coord)
   end
 
@@ -74,7 +74,7 @@ defmodule Aoc2024.Day06 do
           move(grid, :done, position, nil)
 
         {:continue, grid} ->
-          {new_coord, char} = Grid.move(grid, new_position, new_dir)
+          {new_coord, char} = Grid.next(grid, new_position, new_dir)
           move(grid, lookahead(new_dir, char), new_position, new_coord)
       end
     end

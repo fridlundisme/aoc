@@ -89,7 +89,7 @@ defmodule Aoc2024.Day04 do
 
   def string_from_diagonal(grid, coordinates, direction, char, list) do
     {new_coords, new_char} =
-      Grid.move(grid, coordinates, direction)
+      Grid.next(grid, coordinates, direction)
 
     if direction == :nw do
       # IO.inspect({:old, {char, coordinates}, :new, {new_coords, new_char}})

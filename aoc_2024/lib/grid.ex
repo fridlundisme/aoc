@@ -67,6 +67,20 @@ defmodule Grid do
     }
   end
 
+  def get_col(grid, x_prime) do
+    Map.filter(grid, fn {{x1, _y1}, _} -> x1 == x_prime end)
+    |> Map.to_list()
+    |> Enum.sort(fn {{_, y}, _}, {{_, y_2}, _} -> y < y_2 end)
+    |> Enum.map(fn {_, val} -> val end)
+  end
+
+  def get_row(grid, y_prime) do
+    Map.filter(grid, fn {{_x1, y1}, _} -> y1 == y_prime end)
+    |> Map.to_list()
+    |> Enum.sort(fn {{x, _}, _}, {{x_2, _}, _} -> x < x_2 end)
+    |> Enum.map(fn {_, val} -> val end)
+  end
+
   def mark_cells(grid, cells, mark) when is_list(cells) do
     Enum.reduce(cells, grid, fn {pos, _}, acc_grid ->
       Map.update(acc_grid, pos, :out, fn val -> {val, mark} end)
@@ -158,15 +172,43 @@ defmodule Grid do
     end
   end
 
-  def move(grid, from, direction) when is_atom(direction) do
-    new_coordinates(from, @directions_by_type[direction])
-    |> then(fn coord ->
-      if Map.has_key?(grid, coord) do
-        {coord, Map.get(grid, coord)}
-      else
-        {:error, coord}
-      end
-    end)
+  def next(grid, from, direction) when is_atom(direction) do
+    new_coord = new_coordinates(from, @directions_by_type[direction])
+
+    case get_key(grid, new_coord) do
+      {:error, coord} -> {:error, coord}
+      {coord, val} -> {coord, val}
+    end
+  end
+
+  # TODO What is the purpose here?
+  # Move pos X -> Y
+  # Return Map with value on new position.
+  # Should it handle multiple? No use Enumerable instead
+  def move(grid, from, direction, new_val \\ ".") do
+    case next(grid, from, direction) do
+      {:error, coord} ->
+        {:error, {coord, nil}, grid}
+
+      {coord, _} ->
+        {old_coord, moving_val} = get_key(grid, from)
+
+        IO.inspect({get_key(grid, from), {:new_val, new_val}}, label: "Grid.move")
+
+        grid =
+          Map.replace!(grid, coord, moving_val)
+          |> Map.replace!(old_coord, new_val)
+
+        {:ok, {coord, moving_val}, grid}
+    end
+  end
+
+  defp get_key(grid, coord) do
+    if Map.has_key?(grid, coord) do
+      {coord, Map.get(grid, coord)}
+    else
+      {:error, coord}
+    end
   end
 
   def rotate(direction) do
@@ -183,19 +225,19 @@ defmodule Grid do
     {x1 + y1, x2 + y2}
   end
 
-  def print(%Grid{grid: grid, width: w, height: h}, to_find, to_file \\ [write: false]) do
+  def print(%Grid{grid: grid, width: w, height: h}, to_find \\ nil, to_file \\ [write: false]) do
     # Build a string for each row
     result =
-      0..h
+      0..(h - 1)
       |> Enum.map(fn row ->
-        0..w
+        0..(w - 1)
         |> Enum.map(fn col ->
-          val = Map.get(grid, {row, col}, ".")
+          val = Map.get(grid, {col, row}, ".")
 
           if to_find do
             String.replace(to_string(val), to_find, "#")
           else
-            Map.get(grid, {row, col}, ".")
+            Map.get(grid, {col, row}, ".")
           end
         end)
         |> Enum.join("")
@@ -203,7 +245,7 @@ defmodule Grid do
       # Join all rows with a newline
       |> Enum.join("\n")
 
-    # IO.puts(result)
+    IO.puts(result)
 
     if Keyword.get(to_file, :write, false) do
       file_path = Keyword.get(to_file, :path)
