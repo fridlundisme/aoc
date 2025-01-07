@@ -23,7 +23,7 @@ defmodule Aoc2024.MixProject do
     [
       {:igniter, "~> 0.3"},
       {:tz, "~> 0.28"},
-      {:benchee, "~> 1.3", only: :dev},
+      {:benchee, "~> 1.3", only: [:dev, :test]},
       {:req, "~> 0.5"},
       {:nx, "~> 0.9.2"}
       # {:dep_from_hexpm, "~> 0.3.0"},
